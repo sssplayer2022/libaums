@@ -181,7 +181,12 @@ public class UsbFileWrapper extends AbstractUsbFile {
 
         while(iterator.hasNext()) {
             FSEntry entry = iterator.next();
-            list.add(entry.getName());
+            String name = entry.getName();
+            if (name.equals(".") || name.equals("..") || name.charAt(0) == '$') {
+                continue;
+            }
+
+            list.add(name);
         }
 
         String[] array = new String[list.size()];
@@ -212,6 +217,10 @@ public class UsbFileWrapper extends AbstractUsbFile {
         String parentPathForChild = parentPathForChild();
         while(iterator.hasNext()) {
             FSEntry entry = iterator.next();
+            String name = entry.getName();
+            if (name.equals(".") || name.equals("..") || name.charAt(0) == '$') {
+                continue;
+            }
             list.add(new UsbFileWrapper(entry, parentPathForChild));
         }
 

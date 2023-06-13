@@ -45,6 +45,8 @@ internal constructor(private val blockDevice: BlockDeviceDriver, private val fat
     override val isDirectory: Boolean
         get() = false
 
+    override val parentPath: String?
+        get() = null
     override var name: String
         get() = entry.name
         @Throws(IOException::class)

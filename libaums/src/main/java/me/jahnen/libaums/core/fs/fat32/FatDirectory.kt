@@ -61,6 +61,9 @@ internal constructor(
             override var parent: FatDirectory?) : AbstractUsbFile() {
 
     private lateinit var chain: ClusterChain
+
+    override val parentPath: String?
+        get() = null
     /**
      * Entries read from the device.
      */

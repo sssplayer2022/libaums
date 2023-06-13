@@ -1,6 +1,10 @@
 package me.jahnen.libaums.javafs.wrapper.fs;
 
+import android.text.TextUtils;
 import android.util.Log;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import me.jahnen.libaums.core.fs.AbstractUsbFile;
 import me.jahnen.libaums.core.fs.UsbFile;
@@ -33,8 +37,20 @@ public class UsbFileWrapper extends AbstractUsbFile {
     private final Object brokenLock = new Object();
     private boolean broken;
     private boolean brokenFlag;
+
+    private String parentPath;
     public UsbFileWrapper(FSEntry entry) throws IOException {
         this.entry = entry;
+
+        if(entry.isDirectory()) {
+            dir = entry.getDirectory();
+        } else {
+            file = entry.getFile();
+        }
+    }
+    public UsbFileWrapper(FSEntry entry, String parentPath) throws IOException {
+        this.entry = entry;
+        this.parentPath = parentPath;
 
         if(entry.isDirectory()) {
             dir = entry.getDirectory();
@@ -45,6 +61,42 @@ public class UsbFileWrapper extends AbstractUsbFile {
 
     public UsbFileWrapper(FSDirectory dir) {
         this.dir = dir;
+    }
+
+    @NonNull
+    @Override
+    public String getAbsolutePath() {
+        if (isRoot()) {
+            return "/";
+        }
+
+        String path = getParentPath();
+        if (!TextUtils.isEmpty(path)) {
+            return path + "/" + getName();
+        }
+
+        return super.getAbsolutePath();
+    }
+
+    @Nullable
+    @Override
+    public String getParentPath() {
+        if (isRoot())
+            return null;
+        else
+            return parentPath;
+    }
+
+    private String parentPathForChild() {
+        if (isRoot()) {
+            return "/";
+        } else {
+            if (!TextUtils.isEmpty(parentPath)) {
+                return parentPath + "/" + getName();
+            }
+        }
+
+        return null;
     }
 
     @Override
@@ -157,9 +209,10 @@ public class UsbFileWrapper extends AbstractUsbFile {
             return new UsbFile[0];
         }
 
+        String parentPathForChild = parentPathForChild();
         while(iterator.hasNext()) {
             FSEntry entry = iterator.next();
-            list.add(new UsbFileWrapper(entry));
+            list.add(new UsbFileWrapper(entry, parentPathForChild));
         }
 
         UsbFile[] array = new UsbFile[list.size()];

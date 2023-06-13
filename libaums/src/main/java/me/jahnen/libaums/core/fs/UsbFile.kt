@@ -62,6 +62,8 @@ interface UsbFile : Closeable {
      */
     val absolutePath: String
 
+    val parentPath:String?
+
     /**
      * Returns the parent directory for the file or directory or null if this is
      * the root directory.

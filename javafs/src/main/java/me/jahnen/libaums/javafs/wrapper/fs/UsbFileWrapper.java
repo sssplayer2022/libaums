@@ -34,6 +34,8 @@ public class UsbFileWrapper extends AbstractUsbFile {
     private FSDirectory dir;
     private FSFile file;
 
+    private boolean root;
+
     private final Object brokenLock = new Object();
     private boolean broken;
     private boolean brokenFlag;
@@ -47,6 +49,12 @@ public class UsbFileWrapper extends AbstractUsbFile {
         } else {
             file = entry.getFile();
         }
+    }
+
+    public static UsbFileWrapper buildRoot(FSEntry entry) throws IOException {
+        UsbFileWrapper root = new UsbFileWrapper(entry);
+        root.root = true;
+        return root;
     }
     public UsbFileWrapper(FSEntry entry, String parentPath) throws IOException {
         this.entry = entry;
@@ -71,6 +79,10 @@ public class UsbFileWrapper extends AbstractUsbFile {
         }
 
         String path = getParentPath();
+        if ("/".equals(path)) {
+            return "/" + getName();
+        }
+
         if (!TextUtils.isEmpty(path)) {
             return path + "/" + getName();
         }
@@ -91,6 +103,10 @@ public class UsbFileWrapper extends AbstractUsbFile {
         if (isRoot()) {
             return "/";
         } else {
+            if ("/".equals(parentPath)) {
+                return "/" + getName();
+            }
+
             if (!TextUtils.isEmpty(parentPath)) {
                 return parentPath + "/" + getName();
             }
@@ -310,12 +326,16 @@ public class UsbFileWrapper extends AbstractUsbFile {
 
     @Override
     public boolean isRoot() {
+        return root;
+        /*
         try {
             return entry.getId().equals(entry.getFileSystem().getRootEntry().getId());
         } catch (IOException e) {
             Log.e(TAG, "error checking id for determining root", e);
             return false;
         }
+
+         */
     }
 
     @Override

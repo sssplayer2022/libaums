@@ -85,6 +85,10 @@ abstract class AbstractUsbFile : UsbFile {
         return name
     }
 
+    override fun isBroken(): Boolean {
+        return false
+    }
+
     override fun equals(other: Any?): Boolean {
         // TODO add getFileSystem and check if file system is the same
         // TODO check reference

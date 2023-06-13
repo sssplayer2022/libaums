@@ -16,6 +16,7 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 /**
  * Created by magnusja on 01/03/17.
@@ -29,6 +30,9 @@ public class UsbFileWrapper extends AbstractUsbFile {
     private FSDirectory dir;
     private FSFile file;
 
+    private final Object brokenLock = new Object();
+    private boolean broken;
+    private boolean brokenFlag;
     public UsbFileWrapper(FSEntry entry) throws IOException {
         this.entry = entry;
 
@@ -106,9 +110,22 @@ public class UsbFileWrapper extends AbstractUsbFile {
             throw new UnsupportedOperationException("This is a file!");
         }
 
+        if (broken) {
+            return new String[0];
+        }
+
         List<String> list = new ArrayList<>();
 
-        Iterator<? extends FSEntry> iterator = dir.iterator();
+        Iterator<? extends FSEntry> iterator = null;
+        try {
+            iterator = dir.iterator();
+        } catch (NoSuchElementException ignore) {
+            synchronized (brokenLock) {
+                brokenFlag = true;
+                broken = true;
+            }
+            return new String[0];
+        }
 
         while(iterator.hasNext()) {
             FSEntry entry = iterator.next();
@@ -129,7 +146,16 @@ public class UsbFileWrapper extends AbstractUsbFile {
 
         List<UsbFile> list = new ArrayList<>();
 
-        Iterator<? extends FSEntry> iterator = dir.iterator();
+        Iterator<? extends FSEntry> iterator = null;
+        try {
+            iterator = dir.iterator();
+        } catch (NoSuchElementException ignore) {
+            synchronized (brokenLock) {
+                broken = true;
+                brokenFlag = true;
+            }
+            return new UsbFile[0];
+        }
 
         while(iterator.hasNext()) {
             FSEntry entry = iterator.next();
@@ -227,6 +253,20 @@ public class UsbFileWrapper extends AbstractUsbFile {
         } catch (IOException e) {
             Log.e(TAG, "error checking id for determining root", e);
             return false;
+        }
+    }
+
+    @Override
+    public boolean isBroken() {
+        synchronized (brokenLock) {
+            if (!brokenFlag) {
+                try {
+                    list();
+                } catch (IOException ignore) {
+
+                }
+            }
+            return broken;
         }
     }
 }

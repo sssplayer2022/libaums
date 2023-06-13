@@ -35,6 +35,21 @@ allprojects {
     }
 }
 
+
+static def getBuildNumber() {
+    return System.getenv("BUILD_NUMBER") as Integer ?: 0
+}
+
+ext {
+    publishGroupId = 'com.mxplay.code'
+    publishVersion = "0.99.0.${getBuildNumber()}"
+    publishVersionCode = 1
+    publishScript = 'https://raw.githubusercontent.com/ZenMX/mavenPublisher/master/publish.gradle'
+    //please do not format this line, just change the real version of ndk.
+    //script will parse this line for ndk version.
+    ndkVersion="21.4.7075529"
+}
+
 task clean(type: Delete) {
     delete rootProject.buildDir
 }

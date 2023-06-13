@@ -27,8 +27,6 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.mindpipe.android.logging.log4j.LogCatAppender;
-
 /**
  * Created by magnusja on 3/1/17.
  */
@@ -40,9 +38,9 @@ public class JavaFsFileSystemCreator implements FileSystemCreator {
     private static List<FileSystemType> fsTypes = new ArrayList<>();
 
     static {
-        final Logger root = Logger.getRootLogger();
-        final LogCatAppender logCatAppender = new LogCatAppender();
-        root.addAppender(logCatAppender);
+//        final Logger root = Logger.getRootLogger();
+//        final LogCatAppender logCatAppender = new LogCatAppender();
+//        root.addAppender(logCatAppender);
 
         fsTypes.add(new NTFSFileSystemType());
         fsTypes.add(new ExFatFileSystemType());

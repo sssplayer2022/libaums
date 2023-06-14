@@ -2,9 +2,10 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'org.jetbrains.dokka'
 
-Properties props = new Properties()
-props.load(new FileInputStream(project.rootProject.file('local.properties')))
-String libusbDir = props['libusb.dir']
+//Properties props = new Properties()
+//props.load(new FileInputStream(project.rootProject.file('local.properties')))
+//String libusbDir = props['libusb.dir']
+String libusbDir = project.rootProject.file('libusb').getAbsolutePath()
 
 ext {
     PUBLISH_GROUP_ID = 'me.jahnen.libaums'
